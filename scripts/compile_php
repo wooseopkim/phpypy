@@ -1,0 +1,8 @@
+#!/bin/sh
+
+set -e
+
+./buildconf
+./configure --enable-embed
+make -j $(nproc)
+make install -j $(nproc)
