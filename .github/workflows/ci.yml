@@ -14,10 +14,10 @@ jobs:
         with:
           submodules: recursive
       - run: pip install pipenv
-      - uses: pipenv sync
-      - uses: pipenv run check
-      - uses: pipenv run lint
-      - uses: pipenv run test
+      - run: pipenv sync
+      - run: pipenv run check
+      - run: pipenv run lint
+      - run: pipenv run test
   build:
     runs-on: ubuntu-latest
     needs: [check]
@@ -26,5 +26,5 @@ jobs:
         with:
           submodules: recursive
       - run: pip install pipenv
-      - uses: pipenv sync
-      - uses: pipenv run flit build
+      - run: pipenv sync
+      - run: pipenv run flit build
