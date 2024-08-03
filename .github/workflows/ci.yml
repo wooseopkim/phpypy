@@ -14,7 +14,7 @@ jobs:
         with:
           submodules: recursive
       - run: pip install pipenv
-      - run: pipenv sync
+      - run: pipenv sync --dev
       - run: pipenv run check
       - run: pipenv run lint
       - run: pipenv run test
@@ -26,5 +26,5 @@ jobs:
         with:
           submodules: recursive
       - run: pip install pipenv
-      - run: pipenv sync
+      - run: pipenv sync --dev
       - run: pipenv run flit build
