@@ -10,7 +10,7 @@ os_arch = {
 }[platform.machine()]
 lib_path = os.path.join(os.path.dirname(__file__), "..", "lib", os_name, os_arch)
 
-if not len([x for x in os.listdir(lib_path) if x != ".gitkeep"]):
+if not len([x for x in os.listdir(lib_path) if x.endswith(".so")]):
     raise Exception(f"libraries are not found under {lib_path}")
 
 if not os.getenv("LD_LIBRARY_PATH", None):
