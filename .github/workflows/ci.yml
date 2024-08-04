@@ -20,6 +20,12 @@ jobs:
       - run: pipenv sync --dev
       - run: pipenv run check
       - run: pipenv run lint
-      - run: ./scripts/extract_libs '${{ matrix.platform }}'
+      - id: cache-libs
+        uses: actions/cache@v4
+        with:
+          path: ./lib/${{ matrix.platform }}
+          key: ${{ matrix.platform }}
+      - if: steps.cache-libs.outputs.cache-hit != 'true'
+        run: ./scripts/extract_libs '${{ matrix.platform }}'
       - run: pipenv run test
       - run: pipenv run flit build
