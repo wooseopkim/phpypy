@@ -15,7 +15,7 @@ if not len([x for x in os.listdir(lib_path) if x != ".gitkeep"]):
 
 if not os.getenv("LD_LIBRARY_PATH", None):
     os.environ["LD_LIBRARY_PATH"] = f"{lib_path}:{os.getenv('LD_LIBRARY_PATH', '')}"
-    os.execv(sys.executable, [sys.executable, sys.argv[0]])
+    os.execv(sys.executable, [sys.executable] + sys.argv)
 
 
 sys.path.append(lib_path)
