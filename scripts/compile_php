@@ -2,7 +2,7 @@
 
 set -e
 
-./buildconf
+./buildconf --force
 ./configure --enable-embed
 make -j $(nproc)
 make install -j $(nproc)
