@@ -7,7 +7,7 @@ on:
       - main
 
 jobs:
-  check:
+  build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -34,5 +34,41 @@ jobs:
       - if: steps.cache-libs.outputs.cache-hit != 'true'
         run: ./scripts/extract_libs '${{ matrix.platform }}'
 
+      - id: target-platform
+        run: |
+          SPLIT=(${PLATFORM//\// })
+          echo "os=${SPLIT[0]}" >> $GITHUB_OUTPUT
+          echo "arch=${SPLIT[1]}" >> $GITHUB_OUTPUT
+        env:
+          PLATFORM: ${{ matrix.platform }}
+      - if: github.ref == 'refs/heads/main'
+        # currently v4 does not work with nektos/act - same for download-artifact
+        # see https://github.com/nektos/act/issues/329
+        uses: actions/upload-artifact@v3
+        with:
+          name: libs-${{ steps.target-platform.outputs.os }}-${{ steps.target-platform.outputs.arch }}
+          path: ./lib
+          if-no-files-found: error
+
       - run: pipenv run test
       - run: pipenv run flit build
+  publish:
+    if: github.ref == 'refs/heads/main'
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install pipenv
+      - run: pipenv sync --dev
+
+      - uses: actions/download-artifact@v3
+        with:
+          path: /tmp/phpypy
+          pattern: libs-*
+      - run: mv /tmp/phpypy/libs-* ./lib
+
+      - run: pipenv run flit publish
+        env:
+          FLIT_INDEX_URL: https://test.pypi.org/legacy/
+          FLIT_USERNAME: __token__
+          FLIT_PASSWORD: ${{ secrets.PYPI_TOKEN }}
