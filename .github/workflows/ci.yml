@@ -30,7 +30,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ./lib/${{ matrix.platform }}
-          key: libs-${{ matrix.platform }}-${{ steps.submodule-hashes.outputs.php-src }}-${{ steps.submodule-hashes.outputs.phpy }}
+          key: libs-${{ matrix.platform }}-${{ github.sha }}-${{ steps.submodule-hashes.outputs.php-src }}-${{ steps.submodule-hashes.outputs.phpy }}
       - if: steps.cache-libs.outputs.cache-hit != 'true'
         run: ./scripts/extract_libs '${{ matrix.platform }}'
 
