@@ -33,7 +33,9 @@ jobs:
           key: libs-${{ matrix.platform }}-${{ hashFiles('./scripts', './docker') }}-${{ steps.submodule-hashes.outputs.php-src }}-${{ steps.submodule-hashes.outputs.phpy }}
       - uses: docker/setup-qemu-action@v3
       - if: steps.cache-libs.outputs.cache-hit != 'true'
-        run: ./scripts/extract_libs '${{ matrix.platform }}'
+        run: ./scripts/extract_libs "$PLATFORM"
+        env:
+          PLATFORM: ${{ matrix.platform }}
 
       - id: target-platform
         run: |
