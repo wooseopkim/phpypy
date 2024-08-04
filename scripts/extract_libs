@@ -2,7 +2,23 @@
 
 set -e
 
-PLATFORM=${1:-linux/amd64}
+case $(uname) in
+  Linux)
+    OS=linux
+    ;;
+  *)
+    OS=unknown
+    ;;
+esac
+case $(arch) in
+  x86_64)
+    ARCH=amd64
+    ;;
+  *)
+    ARCH=unknown
+    ;;
+esac
+PLATFORM=${1:-$OS/$ARCH}
 
 docker buildx build . --platform=$PLATFORM --file ./docker/Dockerfile --tag phpypy --output type=local,dest=./lib/$PLATFORM
 git submodule status > ./lib/$PLATFORM/submodules.txt
