@@ -18,8 +18,10 @@ jobs:
           submodules: recursive
       - run: pip install pipenv
       - run: pipenv sync --dev
+
       - run: pipenv run check
       - run: pipenv run lint
+
       - id: cache-libs
         uses: actions/cache@v4
         with:
@@ -27,5 +29,6 @@ jobs:
           key: ${{ matrix.platform }}
       - if: steps.cache-libs.outputs.cache-hit != 'true'
         run: ./scripts/extract_libs '${{ matrix.platform }}'
+
       - run: pipenv run test
       - run: pipenv run flit build
