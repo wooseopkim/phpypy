@@ -22,11 +22,15 @@ jobs:
       - run: pipenv run check
       - run: pipenv run lint
 
+      - id: submodule-hashes
+        run: |
+          echo "php-src=$(git submodule status ./php-src | awk '{ print $1 }' | cut  -c 1-7)" >> $GITHUB_OUTPUT
+          echo "phpy=$(git submodule status ./phpy | awk '{ print $1 }' | cut  -c 1-7)" >> $GITHUB_OUTPUT
       - id: cache-libs
         uses: actions/cache@v4
         with:
           path: ./lib/${{ matrix.platform }}
-          key: libs-${{ matrix.platform }}-${{ hashFiles('./php-src') }}-${{ hashFiles('./phpy') }}
+          key: libs-${{ matrix.platform }}-${{ steps.submodule-hashes.outputs.php-src }}-${{ steps.submodule-hashes.outputs.phpy }}
       - if: steps.cache-libs.outputs.cache-hit != 'true'
         run: ./scripts/extract_libs '${{ matrix.platform }}'
 
