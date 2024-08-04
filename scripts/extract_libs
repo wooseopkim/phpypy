@@ -5,3 +5,4 @@ set -e
 PLATFORM=${1:-linux/amd64}
 
 docker buildx build . --platform=$PLATFORM --file ./docker/Dockerfile --tag phpypy --output type=local,dest=./lib/$PLATFORM
+git submodule status > ./lib/$PLATFORM/submodules.txt
