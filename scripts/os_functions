@@ -1,0 +1,25 @@
+#!/bin/sh
+
+set -e
+
+os_name() {
+  case $(uname) in
+    Linux)
+      echo linux
+      ;;
+    *)
+      echo unknown
+      ;;
+  esac
+}
+
+os_arch() {
+  case $(arch) in
+    x86_64)
+      echo amd64
+      ;;
+    *)
+      echo unknown
+      ;;
+  esac
+}

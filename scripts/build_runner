@@ -1,0 +1,11 @@
+#!/bin/sh
+
+set -e
+
+. "$(dirname $0)/os_functions"
+
+OS=$(os_name)
+ARCH=$(os_arch)
+PLATFORM=${1:-$OS/$ARCH}
+
+docker buildx build . --platform=$PLATFORM --file ./docker/Dockerfile --target=run --output type=docker,name=phpypy

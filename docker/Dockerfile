@@ -15,6 +15,13 @@ COPY ./phpy ./phpy
 COPY ./scripts/compile_phpy ./scripts/compile_phpy
 RUN cd ./phpy && sh ../scripts/compile_phpy
 
+FROM build AS run
+
+RUN pip install pipenv
+COPY Pipfile* .
+RUN pipenv sync --dev
+COPY . .
+
 FROM scratch AS output
 COPY --from=build /workspace/phpy/lib/phpy.so /
 COPY --from=build /workspace/php-src/libs/libphp.so /

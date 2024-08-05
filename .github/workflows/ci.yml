@@ -7,20 +7,47 @@ on:
       - main
 
 jobs:
-  build:
+  define-matrix:
     runs-on: ubuntu-latest
+    outputs:
+      platforms: ${{ steps.matrix.outputs.platforms }}
+    steps:
+      - id: matrix
+        run: |
+          echo 'platforms=["linux/amd64", "linux/arm64"]' >> "$GITHUB_OUTPUT"
+  check:
+    # for Linux ARM runners are supported only as larger runners,
+    # we need to run cross-platform tests inside Docker containers
+    # see https://docs.github.com/en/actions/using-github-hosted-runners/about-larger-runners/about-larger-runners
+    runs-on: ubuntu-latest
+    needs: [define-matrix]
     strategy:
       matrix:
-        platform: [linux/amd64, linux/arm64]
+        platform: ${{ fromJSON(needs.define-matrix.outputs.platforms) }}
+    env:
+      PLATFORM: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
-      - run: pip install pipenv
-      - run: pipenv sync --dev
 
-      - run: pipenv run check
-      - run: pipenv run lint
+      - uses: docker/setup-qemu-action@v3
+      - run: ./scripts/build_image "$PLATFORM"
+        env:
+          PLATFORM: ${{ matrix.platform }}
+
+      - run: docker run --rm phpypy pipenv run test
+      - run: docker run --rm phpypy pipenv run flit build
+  build:
+    runs-on: ubuntu-latest
+    needs: [define-matrix]
+    strategy:
+      matrix:
+        platform: ${{ fromJSON(needs.define-matrix.outputs.platforms) }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
       - id: submodule-hashes
         run: |
@@ -52,9 +79,6 @@ jobs:
           name: libs-${{ steps.target-platform.outputs.os }}-${{ steps.target-platform.outputs.arch }}
           path: ./lib
           if-no-files-found: error
-
-      - run: pipenv run test
-      - run: pipenv run flit build
   publish:
     if: github.ref == 'refs/heads/main'
     needs: [build]

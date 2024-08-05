@@ -2,23 +2,11 @@
 
 set -e
 
-case $(uname) in
-  Linux)
-    OS=linux
-    ;;
-  *)
-    OS=unknown
-    ;;
-esac
-case $(arch) in
-  x86_64)
-    ARCH=amd64
-    ;;
-  *)
-    ARCH=unknown
-    ;;
-esac
+. "$(dirname $0)/os_functions"
+
+OS=$(os_name)
+ARCH=$(os_arch)
 PLATFORM=${1:-$OS/$ARCH}
 
-docker buildx build . --platform=$PLATFORM --file ./docker/Dockerfile --tag phpypy --output type=local,dest=./lib/$PLATFORM
+docker buildx build . --platform=$PLATFORM --file ./docker/Dockerfile --target=output --output type=local,dest=./lib/$PLATFORM
 git submodule status > ./lib/$PLATFORM/submodules.txt
