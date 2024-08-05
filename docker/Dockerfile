@@ -16,10 +16,14 @@ COPY ./scripts/compile_phpy ./scripts/compile_phpy
 RUN cd ./phpy && sh ../scripts/compile_phpy
 
 FROM build AS run
-
-RUN pip install pipenv
+RUN . ./scripts/os_functions \
+  && LIB_PATH=./lib/$(os_name)/$(os_arch) \
+  && mkdir -p $LIB_PATH \
+  && mv /workspace/phpy/lib/phpy.so $LIB_PATH \
+  && mv /workspace/php-src/libs/libphp.so $LIB_PATH
+RUN apt install -y pipenv
 COPY Pipfile* .
-RUN pipenv sync --dev
+RUN pipenv sync --dev --python $(which python3)
 COPY . .
 
 FROM scratch AS output
