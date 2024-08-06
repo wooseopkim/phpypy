@@ -1,6 +1,6 @@
 FROM debian:bookworm-slim AS build
 
-RUN apt update -y
+RUN apt update
 RUN apt install -y python3-dev git cmake
 # https://github.com/php/php-src/blob/2ebef11/README.md#building-php-source-code
 RUN apt install -y pkg-config build-essential autoconf bison re2c libxml2-dev libsqlite3-dev
