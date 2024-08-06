@@ -7,6 +7,7 @@ os_name = {
 }[platform.system()]
 os_arch = {
     "x86_64": "amd64",
+    "aarch64": "arm64",
 }[platform.machine()]
 lib_path = os.path.join(os.path.dirname(__file__), "..", "lib", os_name, os_arch)
 
