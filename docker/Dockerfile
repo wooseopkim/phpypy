@@ -16,6 +16,7 @@ COPY ./scripts/compile_phpy ./scripts/compile_phpy
 RUN cd ./phpy && sh ../scripts/compile_phpy
 
 FROM build AS run
+COPY ./scripts ./scripts
 RUN . ./scripts/os_functions \
   && LIB_PATH=./lib/$(os_name)/$(os_arch) \
   && mkdir -p $LIB_PATH \
