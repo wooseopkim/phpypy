@@ -39,7 +39,7 @@ jobs:
         with:
           context: .
           file: ./docker/Dockerfile
-          target: build
+          target: output
           push: false
           platforms: ${{ matrix.platform }}
           cache-from: type=registry,ref=ghcr.io/wooseopkim/phpypy:cache-php-src-${{ needs.define-globals.outputs.submodules.php-src }}-phpy-${{ needs.define-globals.outputs.submodules.phpy }}
