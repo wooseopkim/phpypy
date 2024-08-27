@@ -7,6 +7,8 @@ os_name() {
     Linux)
       echo linux
       ;;
+    Darwin)
+      echo darwin
     *)
       echo unknown
       ;;
@@ -19,6 +21,9 @@ os_arch() {
       echo amd64
       ;;
     aarch64)
+      echo arm64
+      ;;
+    arm64)
       echo arm64
       ;;
     *)

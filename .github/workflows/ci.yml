@@ -7,63 +7,81 @@ on:
       - main
 
 jobs:
-  define-matrix:
+  define-globals:
     runs-on: ubuntu-latest
     outputs:
       platforms: ${{ steps.matrix.outputs.platforms }}
+      submodules: ${{ steps.submodules.outputs.platforms }}
     steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - id: matrix
         run: |
           echo 'platforms=["linux/amd64", "linux/arm64"]' >> "$GITHUB_OUTPUT"
+      - id: submodules
+        run: |
+          echo "php-src=$(git submodule status ./php-src | awk '{ print $1 }')" >> "$GITHUB_OUTPUT"
+          echo "phpy=$(git submodule status ./phpy | awk '{ print $1 }')" >> "$GITHUB_OUTPUT"
+  prepare:
+    needs: [define-globals]
+    strategy:
+      matrix:
+        platform: ${{ fromJSON(needs.define-globals.outputs.platforms) }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./docker/Dockerfile
+          target: build
+          push: false
+          platforms: ${{ matrix.platform }}
+          cache-from: type=registry,ref=ghcr.io/wooseopkim/phpypy:cache-php-src-${{ needs.define-globals.outputs.submodules.php-src }}-phpy-${{ needs.define-globals.outputs.submodules.phpy }}
+          cache-to: type=registry,ref=ghcr.io/wooseopkim/phpypy:cache-php-src-${{ needs.define-globals.outputs.submodules.php-src }}-phpy-${{ needs.define-globals.outputs.submodules.phpy }}
   check:
     # for Linux ARM runners are supported only as larger runners,
     # we need to run cross-platform tests inside Docker containers
     # see https://docs.github.com/en/actions/using-github-hosted-runners/about-larger-runners/about-larger-runners
     runs-on: ubuntu-latest
-    needs: [define-matrix]
+    needs: [define-globals, prepare]
     strategy:
       matrix:
-        platform: ${{ fromJSON(needs.define-matrix.outputs.platforms) }}
+        platform: ${{ fromJSON(needs.define-globals.outputs.platforms) }}
     env:
       PLATFORM: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
-
       - uses: docker/setup-qemu-action@v3
-      - run: ./scripts/build_runner "$PLATFORM"
-        env:
-          PLATFORM: ${{ matrix.platform }}
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./docker/Dockerfile
+          target: run
+          push: false
+          load: true
+          tags: phpypy
+          platforms: ${{ matrix.platform }}
+          cache-from: type=registry,ref=ghcr.io/wooseopkim/phpypy:cache-php-src-${{ needs.define-globals.outputs.submodules.php-src }}-phpy-${{ needs.define-globals.outputs.submodules.phpy }}
+          cache-to: type=registry,ref=ghcr.io/wooseopkim/phpypy:cache-php-src-${{ needs.define-globals.outputs.submodules.php-src }}-phpy-${{ needs.define-globals.outputs.submodules.phpy }}
 
       - run: docker run --rm phpypy pipenv run test
       - run: docker run --rm phpypy pipenv run flit build
   build:
     runs-on: ubuntu-latest
-    needs: [define-matrix]
+    needs: [define-globals, prepare]
     strategy:
       matrix:
-        platform: ${{ fromJSON(needs.define-matrix.outputs.platforms) }}
+        platform: ${{ fromJSON(needs.define-globals.outputs.platforms) }}
     steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-
-      - id: submodule-hashes
-        run: |
-          echo "php-src=$(git submodule status ./php-src | awk '{ print $1 }' | cut  -c 1-7)" >> $GITHUB_OUTPUT
-          echo "phpy=$(git submodule status ./phpy | awk '{ print $1 }' | cut  -c 1-7)" >> $GITHUB_OUTPUT
-      - id: cache-libs
-        uses: actions/cache@v4
-        with:
-          path: ./lib/${{ matrix.platform }}
-          key: libs-${{ matrix.platform }}-${{ hashFiles('./scripts', './docker') }}-${{ steps.submodule-hashes.outputs.php-src }}-${{ steps.submodule-hashes.outputs.phpy }}
-      - uses: docker/setup-qemu-action@v3
-      - if: steps.cache-libs.outputs.cache-hit != 'true'
-        run: ./scripts/extract_libs "$PLATFORM"
-        env:
-          PLATFORM: ${{ matrix.platform }}
-
       - id: target-platform
         run: |
           SPLIT=(${PLATFORM//\// })
@@ -71,6 +89,23 @@ jobs:
           echo "arch=${SPLIT[1]}" >> $GITHUB_OUTPUT
         env:
           PLATFORM: ${{ matrix.platform }}
+
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./docker/Dockerfile
+          target: run
+          push: false
+          outputs: type=local,dest=./lib/${{ steps.target-platform.outputs.os }}/${{ steps.target-platform.outputs.arch }}
+          platforms: ${{ matrix.platform }}
+          cache-from: type=registry,ref=ghcr.io/wooseopkim/phpypy:cache-php-src-${{ needs.define-globals.outputs.submodules.php-src }}-phpy-${{ needs.define-globals.outputs.submodules.phpy }}
+          cache-to: type=registry,ref=ghcr.io/wooseopkim/phpypy:cache-php-src-${{ needs.define-globals.outputs.submodules.php-src }}-phpy-${{ needs.define-globals.outputs.submodules.phpy }}
+
       - if: github.ref == 'refs/heads/main'
         # currently v4 does not work with nektos/act - same for download-artifact
         # see https://github.com/nektos/act/issues/329
