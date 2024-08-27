@@ -28,5 +28,5 @@ RUN pipenv sync --dev --python $(which python3)
 COPY . .
 
 FROM scratch AS output
-COPY --from=build /workspace/phpy/lib/phpy.so /
-COPY --from=build /workspace/php-src/libs/libphp.so /
+COPY --from=build_phpy /workspace/phpy/lib/phpy.so /
+COPY --from=build_php_src /workspace/php-src/libs/libphp.so /
