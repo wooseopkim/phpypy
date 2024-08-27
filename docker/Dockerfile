@@ -9,7 +9,7 @@ RUN cd ./php-src && sh ../scripts/compile_php
 
 FROM debian:bookworm-slim AS build_phpy
 RUN apt update
-RUN apt install -y python3-dev git cmake
+RUN apt install -y build-essential python3-dev git cmake
 WORKDIR /workspace
 COPY ./phpy ./phpy
 COPY ./scripts/compile_phpy ./scripts/compile_phpy
