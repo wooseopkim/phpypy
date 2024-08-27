@@ -65,7 +65,7 @@ jobs:
         with:
           context: .
           file: ./docker/Dockerfile
-          target: run
+          target: output
           push: false
           load: true
           tags: phpypy
@@ -99,7 +99,7 @@ jobs:
         with:
           context: .
           file: ./docker/Dockerfile
-          target: run
+          target: output
           push: false
           outputs: type=local,dest=./lib/${{ steps.target-platform.outputs.os }}/${{ steps.target-platform.outputs.arch }}
           platforms: ${{ matrix.platform }}
