@@ -123,7 +123,7 @@ jobs:
       - run: pip install pipenv
       - run: pipenv sync --dev
 
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4.1.7
         with:
           path: /tmp/phpypy
           pattern: libs-*
