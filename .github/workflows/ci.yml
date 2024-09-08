@@ -141,7 +141,6 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           path: /tmp/phpypy
-          pattern: libs-*
       - run: mv /tmp/phpypy/libs-* ./lib
 
       - run: pipenv run flit publish
