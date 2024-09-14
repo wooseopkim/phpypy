@@ -9,6 +9,7 @@ os_name() {
       ;;
     Darwin)
       echo darwin
+      ;;
     *)
       echo unknown
       ;;
