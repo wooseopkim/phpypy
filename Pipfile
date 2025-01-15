@@ -10,12 +10,13 @@ flit = "*"
 mypy = "*"
 ruff = "*"
 pytest = "*"
+pyright = "*"
 
 [requires]
 python_version = "3.10"
 
 [scripts]
-check = "mypy ./phpypy"
+check = "pyright ./phpypy"
 lint = "ruff check ./phpypy"
 format = "ruff format ./phpypy"
 test = "pytest ./phpypy"

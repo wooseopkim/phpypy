@@ -1,0 +1,10 @@
+{
+    "exclude": [
+        "phpy",
+        "php-src"
+    ],
+    "include": [
+        "phpypy"
+    ],
+    "typeCheckingMode": "strict"
+}

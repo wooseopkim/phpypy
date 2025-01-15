@@ -1,4 +1,6 @@
-def test_import():
+def test_globals():
     from . import phpy
 
-    print(phpy.globals)
+    env = phpy.globals("_ENV") # type: ignore
+
+    assert env is not None

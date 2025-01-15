@@ -1,6 +1,6 @@
-import sys
 import os
 import platform
+import sys
 
 os_name = {
     "Linux": "linux",
