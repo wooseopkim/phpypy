@@ -1,0 +1,16 @@
+{
+    "[github-actions-workflow]": {
+        "editor.defaultFormatter": "arahata.linter-actionlint"
+    },
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.vscode-pylance"
+    },
+    "[shellscript]": {
+        "editor.defaultFormatter": "timonwong.shellcheck"
+    },
+    "editor.codeActionsOnSave": {
+        "source": "explicit"
+    },
+    "editor.defaultFormatter": "EditorConfig.EditorConfig",
+    "editor.formatOnSave": true
+}
