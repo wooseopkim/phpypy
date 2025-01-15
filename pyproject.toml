@@ -15,6 +15,7 @@ Source = "https://github.com/wooseopkim/phpypy"
 
 [project.scripts]
 flit = "flit:main"
+phpypy = "phpypy:cli"
 
 [dependency-groups]
 dev = [
