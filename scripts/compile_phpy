@@ -3,4 +3,4 @@
 set -e
 
 cmake .
-make -j $(nproc)
+make -j "$(nproc)"

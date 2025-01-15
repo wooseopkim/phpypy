@@ -4,5 +4,5 @@ set -e
 
 ./buildconf --force
 ./configure --enable-embed
-make -j $(nproc)
-make install -j $(nproc)
+make -j "$(nproc)"
+make install -j "$(nproc)"
