@@ -8,6 +8,7 @@ authors = [{name = "Wooseop Kim"}]
 license = {file = "LICENSE"}
 classifiers = ["License :: OSI Approved :: MIT License"]
 dynamic = ["version", "description"]
+requires-python = ">=3.10"
 
 [project.urls]
 Source = "https://github.com/wooseopkim/phpypy"
@@ -15,6 +16,24 @@ Source = "https://github.com/wooseopkim/phpypy"
 [project.scripts]
 flit = "flit:main"
 
+[dependency-groups]
+dev = [
+    "flit>=3.10.1",
+    "pyright>=1.1.392",
+    "pytest>=8.3.4",
+    "ruff>=0.9.1",
+]
+
 [tool.flit.sdist]
 include = ["lib"]
 exclude = ["php-src", "phpy", "docker", "scripts", "**/.git*"]
+
+[tool.ruff]
+include = ["pyproject.toml", "phpypy/**/*.py"]
+
+[tool.pyright]
+include = ["phpypy"]
+typeCheckingMode = "strict"
+
+[tool.pytest.ini_options]
+testpaths = ["phpypy"]

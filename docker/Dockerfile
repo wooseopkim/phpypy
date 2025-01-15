@@ -1,4 +1,4 @@
-FROM debian:bookworm-slim AS build
+FROM ghcr.io/astral-sh/uv:bookworm-slim AS build
 RUN apt update
 WORKDIR /workspace
 
@@ -21,8 +21,8 @@ RUN . ./scripts/os_functions \
   && mv /workspace/phpy/lib/phpy.so $LIB_PATH \
   && mv /workspace/php-src/libs/libphp.so $LIB_PATH
 RUN apt install -y pipenv
-COPY Pipfile* .
-RUN pipenv sync --dev --python $(which python3)
+COPY uv.lock .
+RUN uv sync --frozen --python $(which python3)
 COPY . .
 
 FROM scratch AS output

@@ -86,8 +86,8 @@ jobs:
           cache-from: type=registry,ref=ghcr.io/wooseopkim/phpypy:cache-php-src-${{ needs.define-globals.outputs.submodules.php-src }}-phpy-${{ needs.define-globals.outputs.submodules.phpy }}
           cache-to: type=registry,ref=ghcr.io/wooseopkim/phpypy:cache-php-src-${{ needs.define-globals.outputs.submodules.php-src }}-phpy-${{ needs.define-globals.outputs.submodules.phpy }}
 
-      - run: docker run --rm phpypy pipenv run test
-      - run: docker run --rm phpypy pipenv run flit build
+      - run: docker run --rm phpypy uv run test
+      - run: docker run --rm phpypy uv run flit build
   build:
     runs-on: ubuntu-latest
     needs: [define-globals, prepare]
@@ -138,8 +138,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: pip install pipenv
-      - run: pipenv sync --dev
+      - uses: astral-sh/setup-uv@v5
+      - run: uv sync --frozen
 
       - uses: actions/download-artifact@v3
         with:
@@ -147,7 +147,7 @@ jobs:
       - run: mkdir ./lib
       - run: mv /tmp/phpypy/libs-* ./lib
 
-      - run: pipenv run flit publish
+      - run: uv run flit publish
         env:
           FLIT_INDEX_URL: https://test.pypi.org/legacy/
           FLIT_USERNAME: __token__
