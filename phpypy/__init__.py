@@ -10,7 +10,9 @@ import phpy
 
 def cli():
     import sys
+
     for arg in sys.argv[1:]:
         phpy.eval(arg)
+
 
 __all__ = ["phpy"]
