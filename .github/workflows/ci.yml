@@ -127,9 +127,7 @@ jobs:
           cache-to: ${{ needs.define-globals.outputs.cache-destination }}
 
       - if: github.ref == 'refs/heads/main'
-        # currently v4 does not work with nektos/act - same for download-artifact
-        # see https://github.com/nektos/act/issues/329
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: libs-${{ steps.target-platform.outputs.os }}-${{ steps.target-platform.outputs.arch }}
           path: ./lib
@@ -143,7 +141,7 @@ jobs:
       - uses: astral-sh/setup-uv@v5
       - run: uv sync --frozen
 
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           path: /tmp/phpypy
       - run: mkdir ./lib
