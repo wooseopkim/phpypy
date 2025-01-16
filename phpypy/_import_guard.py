@@ -2,14 +2,28 @@ import os
 import platform
 import sys
 
-os_name = {
-    "Linux": "linux",
-}[platform.system()]
-os_arch = {
-    "x86_64": "amd64",
-    "aarch64": "arm64",
-}[platform.machine()]
-lib_path = os.path.join(os.path.dirname(__file__), "..", "lib", os_name, os_arch)
+
+def os_name():
+    match platform.system():
+        case "Linux":
+            return "linux"
+        case _:
+            return "unknown"
+
+
+def os_arch():
+    match platform.machine():
+        case "x86_64":
+            return "amd64"
+        case "aarch64":
+            return "arm64"
+        case _:
+            return "unknown"
+
+
+working_directory = os.path.dirname(__file__)
+raw_path = os.path.join(working_directory, "..", "lib", os_name(), os_arch())
+lib_path = os.path.normpath(raw_path)
 
 if not len([x for x in os.listdir(lib_path) if x.endswith(".so")]):
     raise Exception(f"libraries are not found under {lib_path}")
