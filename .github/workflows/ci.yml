@@ -13,7 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       platforms: ${{ steps.matrix.outputs.platforms }}
-      submodules: ${{ steps.submodules.outputs.platforms }}
+      cache-source: ${{ steps.cache.outputs.source }}
+      cache-destination: ${{ steps.cache.outputs.destination }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -21,10 +22,12 @@ jobs:
       - id: matrix
         run: |
           echo 'platforms=["linux/amd64", "linux/arm64"]' >> "$GITHUB_OUTPUT"
-      - id: submodules
+      - id: cache
         run: |
-          echo "php-src=$(git submodule status ./php-src | awk '{ print $1 }')" >> "$GITHUB_OUTPUT"
-          echo "phpy=$(git submodule status ./phpy | awk '{ print $1 }')" >> "$GITHUB_OUTPUT"
+          echo "source=$([ "$ACT" == 'true' ] && echo 'type=local,src=/tmp' || echo 'type=gha')" >> "$GITHUB_OUTPUT"
+          echo "destination=$([ "$ACT" == 'true' ] && echo 'type=local,dest=/tmp' || echo 'type=gha,mode=max')" >> "$GITHUB_OUTPUT"
+        env:
+          ACT: ${{ env.ACT }}
   prepare:
     needs: [define-globals]
     strategy:
@@ -49,8 +52,8 @@ jobs:
           target: output
           push: false
           platforms: ${{ matrix.platform }}
-          cache-from: type=registry,ref=ghcr.io/wooseopkim/phpypy:cache-php-src-${{ needs.define-globals.outputs.submodules.php-src }}-phpy-${{ needs.define-globals.outputs.submodules.phpy }}
-          cache-to: type=registry,ref=ghcr.io/wooseopkim/phpypy:cache-php-src-${{ needs.define-globals.outputs.submodules.php-src }}-phpy-${{ needs.define-globals.outputs.submodules.phpy }}
+          cache-from: ${{ needs.define-globals.outputs.cache-source }}
+          cache-to: ${{ needs.define-globals.outputs.cache-destination }}
   check:
     # for Linux ARM runners are supported only as larger runners,
     # we need to run cross-platform tests inside Docker containers
@@ -82,8 +85,8 @@ jobs:
           load: true
           tags: phpypy
           platforms: ${{ matrix.platform }}
-          cache-from: type=registry,ref=ghcr.io/wooseopkim/phpypy:cache-php-src-${{ needs.define-globals.outputs.submodules.php-src }}-phpy-${{ needs.define-globals.outputs.submodules.phpy }}
-          cache-to: type=registry,ref=ghcr.io/wooseopkim/phpypy:cache-php-src-${{ needs.define-globals.outputs.submodules.php-src }}-phpy-${{ needs.define-globals.outputs.submodules.phpy }}
+          cache-from: ${{ needs.define-globals.outputs.cache-source }}
+          cache-to: ${{ needs.define-globals.outputs.cache-destination }}
 
       - run: docker run --rm phpypy uv run test
       - run: docker run --rm phpypy uv run flit build
@@ -120,8 +123,8 @@ jobs:
           push: false
           outputs: type=local,dest=./lib/${{ steps.target-platform.outputs.os }}/${{ steps.target-platform.outputs.arch }}
           platforms: ${{ matrix.platform }}
-          cache-from: type=registry,ref=ghcr.io/wooseopkim/phpypy:cache-php-src-${{ needs.define-globals.outputs.submodules.php-src }}-phpy-${{ needs.define-globals.outputs.submodules.phpy }}
-          cache-to: type=registry,ref=ghcr.io/wooseopkim/phpypy:cache-php-src-${{ needs.define-globals.outputs.submodules.php-src }}-phpy-${{ needs.define-globals.outputs.submodules.phpy }}
+          cache-from: ${{ needs.define-globals.outputs.cache-source }}
+          cache-to: ${{ needs.define-globals.outputs.cache-destination }}
 
       - if: github.ref == 'refs/heads/main'
         # currently v4 does not work with nektos/act - same for download-artifact
