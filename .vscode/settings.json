@@ -3,7 +3,7 @@
         "editor.defaultFormatter": "arahata.linter-actionlint"
     },
     "[python]": {
-        "editor.defaultFormatter": "ms-python.vscode-pylance"
+        "editor.defaultFormatter": "charliermarsh.ruff"
     },
     "[shellscript]": {
         "editor.defaultFormatter": "timonwong.shellcheck"

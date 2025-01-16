@@ -1,8 +1,9 @@
 {
-	"recommendations": [
-		"ms-python.vscode-pylance",
-		"timonwong.shellcheck",
-		"arahata.linter-actionlint",
-		"EditorConfig.EditorConfig"
-	]
+    "recommendations": [
+        "ms-python.vscode-pylance",
+        "charliermarsh.ruff",
+        "timonwong.shellcheck",
+        "arahata.linter-actionlint",
+        "EditorConfig.EditorConfig"
+    ]
 }
