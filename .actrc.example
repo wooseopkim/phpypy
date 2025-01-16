@@ -1,0 +1,3 @@
+--artifact-server-path /tmp/artifacts
+--cache-server-path /tmp/cache
+--matrix platform:linux/amd64
