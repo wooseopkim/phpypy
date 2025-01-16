@@ -4,7 +4,7 @@ A Python-side wrapper for swoole/phpy
 
 __version__ = "0.0.1"
 
-from phpypy import _import_guard as _import_guard  # noqa: I001
+import phpypy._import_guard as _  # noqa: F401, I001 # pyright: ignore[reportUnusedImport]
 import phpy
 
 
