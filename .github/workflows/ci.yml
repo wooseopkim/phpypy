@@ -144,6 +144,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           path: /tmp/phpypy
+          pattern: libs-*
       - run: mkdir ./lib
       - run: mv /tmp/phpypy/libs-* ./lib
 
